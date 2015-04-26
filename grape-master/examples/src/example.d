@@ -11,7 +11,9 @@ import std.array;
 import std.range;
 import std.random;
 
+import src.ShapeCreator;
 import src.UltraMesh;
+import src.ShapeGroup;
 
 Window window;
 PerspectiveCamera camera;
@@ -60,29 +62,28 @@ bool pressedLeft = false, pressedRight = false, pressedDown = false, pressedUp =
 double cameraX = 0.0;
 double cameraY = 0.0;
 double cameraZ = 0.0;
-VertexGroup[] groups = [];
-Vec3[] vels = [];
+ShapeGroup[] groups = [];
 
 void initUltraMesh() {
 	ultraMesh = new UltraMesh();
 
 	Random gen;
 	ultraMesh.updateBuffers = false;
-	double size = 20;
+	double cubeSize = 1.0;
 	int count = 0;
 	double xPos = -width/2.0;
 	double yPos = -height/2.0;
 	for (int z = -10; z < 0; z++) {
 		for (int i = 0; i < 100; i++) {
 			for (int y = 0; y < 100; y ++) {
-				//groups ~= ultraMesh.addSquare(xPos + i*size, yPos + y*size, 0, size);
-				groups ~= ultraMesh.addCube(-i+5, -y+5, uniform(0, 1000, gen)/1000.0/2+z, 1.0);
-				vels ~= Vec3(uniform(0, 1001, gen)/1000.0-0.5, uniform(0, 1001, gen)/1000.0-0.5, 0.0);
-				count += 1;
+				double cubeX = -i+5;
+				double cubeY = -y+5;
+				double cubeZ = uniform(0, 1000, gen)/1000.0/2+z;
+				groups ~= ShapeCreator.makeCube(ultraMesh, cubeX, cubeY, cubeZ, cubeSize);
 			}
 		}
 	}
-	writeln("Shape Count: ", count);
+	writeln("Shape Count: ", groups.length);
 	//ultraMesh.updateBuffers = true;
 	ultraMesh.updateAllBuffers();
 

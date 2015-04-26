@@ -86,8 +86,7 @@ class UltraMesh
 
 		cameraUniformLocation = glGetUniformLocation(program, cast(char*)"pvmMatrix"); 
 
-		//glEnableVertexAttribArray(0); // Disable our Vertex Array Object  
-		//glBindVertexArray(0); // Disable our Vertex Buffer Object  
+		glBindVertexArray(0); // Disable our Vertex Array Object  
 	}
 	~this() {
 		glDeleteBuffers(1, &indiceBuffer);
@@ -167,143 +166,6 @@ class UltraMesh
 			glBindBuffer(GL_ARRAY_BUFFER, 0); 
 		}
 	}
-	
-	
-	VertexGroup addTriangle(double triangleX, double triangleY, double triangleZ, double width) {
-		if (vertices.capacity() == 0) {
-			vertices.reserve(vertices.data.length*2 + 9);
-		}
-		if (indices.capacity() == 0) {
-			indices.reserve(indices.data.length*2 + 3);
-		}
-		if (color.capacity() == 0) {
-			color.reserve(color.data.length*2 + 12);
-		}
-		int firstVertex = to!int(vertices.data.length);
-		int firstIndice = to!int(indices.data.length);
-		int firstColor = to!int( color.data.length);
-
-		int n = to!int(vertices.data.length/3);
-
-		vertices.put( [triangleX-width/2.0, triangleY-width/2.0, triangleZ,
-			triangleX+width/2.0, triangleY-width/2.0, triangleZ,
-			triangleX, triangleY+width/2.0, triangleZ ] );
-
-		//Add the lines to connect vertices
-		indices.put( [n, n+1, n+2] );
-
-		//For each vertex we need a color R, G, B, A
-		color.put( [colorR, colorG, colorB, colorA,
-			colorR, colorG, colorB, colorA,
-			colorR, colorG, colorB, colorA] );
-
-		int lastVertex = to!int(vertices.data.length);
-		int lastIndice = to!int(indices.data.length);
-		int lastColor = to!int(color.data.length);
-
-		if (updateBuffers) {
-			updateIndiceBufferPartial(firstIndice, lastIndice-firstIndice);
-			updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-			updateColorBufferPartial(firstColor, lastColor-firstColor);
-		}
-
-		return VertexGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, this);
-
-	}
-
-	VertexGroup addSquare(double squareX, double squareY, double squareZ, double size) {
-		if (vertices.capacity() == 0) {
-			vertices.reserve(vertices.data.length*2 + 12);
-		}
-		if (indices.capacity() == 0) {
-			indices.reserve(indices.data.length*2 + 6);
-		}
-		if (color.capacity() == 0) {
-			color.reserve(color.data.length*2 + 16);
-		}
-		int firstVertex = to!int(vertices.data.length);
-		int firstIndice = to!int(indices.data.length);
-		int firstColor = to!int( color.data.length);
-
-		int n = to!int(vertices.data.length/3);
-
-		vertices.put(
-				[ squareX-size/2.0, squareY-size/2.0, squareZ,
-				squareX-size/2.0, squareY+size/2.0, squareZ,
-				squareX+size/2.0, squareY-size/2.0, squareZ,
-				squareX+size/2.0, squareY+size/2.0, squareZ] );
-		
-		//Add the lines to connect vertices
-		indices.put( [n, n+1, n+2, n+3, n+2, n+1] );
-		
-		//For each vertex we need a color R, G, B, A
-		color.put( [colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA] );
-		
-		int lastVertex = to!int(vertices.data.length);
-		int lastIndice = to!int(indices.data.length);
-		int lastColor = to!int(color.data.length);
-
-		if (updateBuffers) {
-			updateIndiceBufferPartial(firstIndice, lastIndice-firstIndice);
-			updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-			updateColorBufferPartial(firstColor, lastColor-firstColor);
-		}
-		
-		return VertexGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, this);
-		
-	}
-	VertexGroup addCube(double squareX, double squareY, double squareZ, double size) {
-		if (vertices.capacity() == 0) {
-			vertices.reserve(vertices.data.length*2 + 12);
-		}
-		if (indices.capacity() == 0) {
-			indices.reserve(indices.data.length*2 + 6);
-		}
-		if (color.capacity() == 0) {
-			color.reserve(color.data.length*2 + 16);
-		}
-		int firstVertex = to!int(vertices.data.length);
-		int firstIndice = to!int(indices.data.length);
-		int firstColor = to!int( color.data.length);
-		
-		int n = to!int(vertices.data.length/3);
-		float s = size/2.0;
-		vertices.put( 		[ -s+squareX, -s+squareY, s+squareZ,  		s+squareX, -s+squareY, s+squareZ,  		s+squareX, s+squareY, s+squareZ,  		-s+squareX, s+squareY, s+squareZ,  		-s+squareX, -s+squareY, -s+squareZ,  		s+squareX, -s+squareY, -s+squareZ,  		s+squareX, s+squareY, -s+squareZ,  		-s+squareX, s+squareY, -s+squareZ ] ); 
-
-		//Add the lines to connect vertices
-		indices.put( [n,n+ 1,n+ 2,n+ 2,n+ 3,n+ 0,n+ 
-				3,n+ 2,n+ 6,n+ 6,n+ 7,n+ 3,n+ 
-				7,n+ 6,n+ 5,n+ 5,n+ 4,n+ 7,n+ 
-				4,n+ 0,n+ 3,n+ 3,n+ 7,n+ 4,n+ 
-				0,n+ 1,n+ 5,n+ 5,n+ 4,n+ 0,n+
-				1,n+ 5,n+ 6,n+ 6,n+ 2,n+ 1 ] );
-		
-		//For each vertex we need a color R, G, B, 7
-		color.put( [colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA] );
-		
-		int lastVertex = to!int(vertices.data.length);
-		int lastIndice = to!int(indices.data.length);
-		int lastColor = to!int(color.data.length);
-		
-		if (updateBuffers) {
-			updateIndiceBufferPartial(firstIndice, lastIndice-firstIndice);
-			updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-			updateColorBufferPartial(firstColor, lastColor-firstColor);
-		}
-		
-		return VertexGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, this);
-		
-	}
 
 	void render(Camera camera) {
 		program.use();
@@ -316,14 +178,9 @@ class UltraMesh
 		scope(exit) glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		//Draw the indices
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiceBuffer);
 		glBindVertexArray(vaoID); // Bind our Vertex Array Object  
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiceBuffer);
-		//glDrawArrays(DrawMode.Triangles, 0, to!int(indices.data.length));
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glBindVertexArray(0); // Unbind our Vertex Array Object  
 		glDrawElements(DrawMode.Triangles, to!int(indices.data.length), GL_UNSIGNED_INT, cast(void*)(0) );
-		//glDrawElements(DrawMode.Triangles, to!int(indices.data.length), GL_UNSIGNED_INT, indices.data.ptr );
 		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		//glBindVertexArray(0); // Unbind our Vertex Array Object
 	}
@@ -358,115 +215,3 @@ static immutable fragmentShaderSource = q{
 		FragColor = vColor;
 	}
 };
-struct VertexGroup {
-	int firstVertex, lastVertex;
-	int firstColor, lastColor;
-	int firstIndice, lastIndice;
-	UltraMesh ultraMesh;
-	float centerX = 0;
-	float centerY = 0;
-	float centerZ = 0;
-	static VertexGroup opCall(int fV, int lV, int fC, int lC, int fI, int lI, UltraMesh uM)
-	{
-		VertexGroup vg = VertexGroup.init;
-		vg.firstVertex = fV;
-		vg.lastVertex = lV;
-		vg.firstColor = fC;
-		vg.lastColor = lC;
-		vg.firstIndice = fI;
-		vg.lastIndice = lI;
-		vg.ultraMesh = uM;
-		vg.calculateCenter();
-		return vg;
-	}
-	void calculateCenter() {
-		int vCount = (lastVertex - firstVertex)/3;
-		for (int i = firstVertex; i < lastVertex; i+= 3) {
-			//writeln("X: ", ultraMesh.vertices.data[i], ", Y: ", ultraMesh.vertices.data[i+1]);
-			centerX += ultraMesh.vertices.data[i]/vCount;
-			centerY += ultraMesh.vertices.data[i+1]/vCount;
-			centerZ += ultraMesh.vertices.data[i+2]/vCount;
-		}
-	}
-	void rotateX(float angle) {
-		float s = sin(angle);
-		float c = cos(angle);
-		for (int i = firstVertex; i < lastVertex; i+=3) {
-			float z = ultraMesh.vertices.data[i+2] - centerZ;
-			float y = ultraMesh.vertices.data[i+1] - centerY;
-			ultraMesh.vertices.data[i+2] = z * c - y * s + centerZ;
-			ultraMesh.vertices.data[i+1] = y * c + z * s + centerY;
-		}
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void rotateY(float angle) {
-		float s = sin(angle);
-		float c = cos(angle);
-		for (int i = firstVertex; i < lastVertex; i+=3) {
-			float x = ultraMesh.vertices.data[i] - centerX;
-			float z = ultraMesh.vertices.data[i+2] - centerZ;
-			ultraMesh.vertices.data[i] = x * c - z * s + centerX;
-			ultraMesh.vertices.data[i+2] = z * c + x * s + centerZ;
-		}
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void rotateZ(float angle) {
-		float s = sin(angle);
-		float c = cos(angle);
-		for (int i = firstVertex; i < lastVertex; i+=3) {
-			float x = ultraMesh.vertices.data[i] - centerX;
-			float y = ultraMesh.vertices.data[i+1] - centerY;
-			ultraMesh.vertices.data[i] = x * c - y * s + centerX;
-			ultraMesh.vertices.data[i+1] = y * c + x * s + centerY;
-		}
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void translateX(float value) {
-		for (int i = firstVertex; i < lastVertex; i+= 3) {
-			ultraMesh.vertices.data[i] += value;
-		}
-		centerX += value;
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void translateY(float value) {
-		for (int i = firstVertex; i < lastVertex; i+= 3) {
-			ultraMesh.vertices.data[i+1] += value;
-		}
-		centerY += value;
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void translateZ(float value) {
-		for (int i = firstVertex; i < lastVertex; i+= 3) {
-			ultraMesh.vertices.data[i+2] += value;
-		}
-		centerZ += value;
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void setPosition(float xPos, float yPos, float zPos) {
-		float moveX = xPos-centerX;
-		float moveY = yPos-centerY;
-		float moveZ = zPos-centerZ;
-		centerX = xPos;
-		centerY = yPos;
-		centerZ = zPos;
-		for (int i = firstVertex; i < lastVertex; i+= 3) {
-			ultraMesh.vertices.data[i] += moveX;
-			ultraMesh.vertices.data[i+1] += moveY;
-			ultraMesh.vertices.data[i+2] += moveZ;
-		}
-		if (ultraMesh.updateBuffers) ultraMesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-	}
-	void setColor(float r, float g, float b, float a) {
-		ubyte rByte = to!ubyte(to!int(r*255));
-		ubyte gByte = to!ubyte(to!int(g*255));
-		ubyte bByte = to!ubyte(to!int(b*255));
-		ubyte aByte = to!ubyte(to!int(a*255));
-		for (int i = firstColor; i < lastColor; i += 4) {
-			ultraMesh.color.data[i] = rByte;
-			ultraMesh.color.data[i+1] = gByte;
-			ultraMesh.color.data[i+2] = bByte;
-			ultraMesh.color.data[i+3] = aByte;
-		}
-		if (ultraMesh.updateBuffers) ultraMesh.updateColorBufferPartial(firstColor, lastColor-firstColor);
-	}
-}
