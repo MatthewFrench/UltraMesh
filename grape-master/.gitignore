@@ -1,0 +1,13 @@
+lib/*.a
+*.o
+build/build
+issue
+Makefile
+document/
+examples/.dub
+examples/bin/
+examples/build.bat
+examples/dub.json
+examples/src/tmp/
+three/
+
