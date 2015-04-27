@@ -1,152 +1,244 @@
 ﻿module src.ShapeCreator;
 import src.UltraMesh;
 import src.ShapeGroup;
+import std.conv;
+import std.random;
+import std.math;
+import std.stdio;
 
 class ShapeCreator
 {
+	static ShapeGroup makeShape(UltraMesh mesh, float[] vertices, int[] indices, ubyte[] colors) {
+		return mesh.add(vertices, indices, colors);
+	}
 	static ShapeGroup makeTriangle(UltraMesh mesh, double triangleX, double triangleY, double triangleZ, double width) {
-		if (mesh.vertices.capacity()-9 <= 0) {
-			mesh.vertices.reserve(mesh.vertices.data.length*2 + 9);
-		}
-		if (mesh.indices.capacity()-3 <= 0) {
-			mesh.indices.reserve(mesh.indices.data.length*2 + 3);
-		}
-		if (mesh.color.capacity()-12 <= 0) {
-			mesh.color.reserve(mesh.color.data.length*2 + 12);
-		}
-		int firstVertex = to!int(mesh.vertices.data.length);
-		int firstIndice = to!int(mesh.indices.data.length);
-		int firstColor = to!int(mesh.color.data.length);
-		
-		int n = to!int(mesh.vertices.data.length/3);
-		
-		mesh.vertices.put( [triangleX-width/2.0, triangleY-width/2.0, triangleZ,
-				triangleX+width/2.0, triangleY-width/2.0, triangleZ,
-				triangleX, triangleY+width/2.0, triangleZ ] );
-		
-		//Add the lines to connect vertices
-		mesh.indices.put( [n, n+1, n+2] );
-		
-		//For each vertex we need a color R, G, B, A
-		mesh.color.put( [colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA] );
-		
-		int lastVertex = to!int(mesh.vertices.data.length);
-		int lastIndice = to!int(mesh.indices.data.length);
-		int lastColor = to!int(mesh.color.data.length);
-		
-		if (mesh.updateBuffers) {
-			mesh.updateIndiceBufferPartial(firstIndice, lastIndice-firstIndice);
-			mesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-			mesh.updateColorBufferPartial(firstColor, lastColor-firstColor);
+		float[] vertices = 
+			[triangleX-width/2.0, triangleY-width/2.0, triangleZ,
+			triangleX+width/2.0, triangleY-width/2.0, triangleZ,
+			triangleX, triangleY+width/2.0, triangleZ ];
+			
+		int[] indices = [0, 1, 2];
+
+		ubyte[] colors = [];
+
+		Random gen;
+		for (int i = 0; i < vertices.length/3; i++) {
+			ubyte r = to!ubyte(uniform(0, 256, gen));
+			ubyte g = to!ubyte(uniform(0, 256, gen));
+			ubyte b = to!ubyte(uniform(0, 256, gen));
+			ubyte a = to!ubyte(255);
+			colors ~= [r, g, b, a];
 		}
 		
-		return ShapeGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, mesh);
-		
+		return mesh.add(vertices, indices, colors);
 	}
 	
 	static ShapeGroup makeSquare(UltraMesh mesh, double squareX, double squareY, double squareZ, double size) {
-		if (mesh.vertices.capacity()-12 <= 0) {
-			mesh.vertices.reserve(mesh.vertices.data.length*2 + 12);
-		}
-		if (mesh.indices.capacity()-6 <= 0) {
-			mesh.indices.reserve(mesh.indices.data.length*2 + 6);
-		}
-		if (mesh.color.capacity() - 16 <= 0) {
-			mesh.color.reserve(mesh.color.data.length*2 + 16);
-		}
-		int firstVertex = to!int(mesh.vertices.data.length);
-		int firstIndice = to!int(mesh.indices.data.length);
-		int firstColor = to!int(mesh.color.data.length);
-		
-		int n = to!int(mesh.vertices.data.length/3);
-
-		mesh.vertices.put(
+		float[] vertices = 
 			[ squareX-size/2.0, squareY-size/2.0, squareZ,
 				squareX-size/2.0, squareY+size/2.0, squareZ,
 				squareX+size/2.0, squareY-size/2.0, squareZ,
-				squareX+size/2.0, squareY+size/2.0, squareZ] );
+				squareX+size/2.0, squareY+size/2.0, squareZ];
 
 		//Add the lines to connect vertices
-		mesh.indices.put( [n, n+1, n+2, n+3, n+2, n+1] );
-		
-		//For each vertex we need a color R, G, B, A
-		mesh.color.put( [colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA] );
-		
-		int lastVertex = to!int(mesh.vertices.data.length);
-		int lastIndice = to!int(mesh.indices.data.length);
-		int lastColor = to!int(mesh.color.data.length);
+		int[] indices = [0, 1, 2, 3, 2, 1];
 
-		if (mesh.updateBuffers) {
-			mesh.updateIndiceBufferPartial(firstIndice, lastIndice-firstIndice);
-			mesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-			mesh.updateColorBufferPartial(firstColor, lastColor-firstColor);
+		ubyte[] colors = [];
+		//For each vertex we need a color R, G, B, A
+		Random gen;
+		for (int i = 0; i < vertices.length/3; i++) {
+			ubyte r = to!ubyte(uniform(0, 256, gen));
+			ubyte g = to!ubyte(uniform(0, 256, gen));
+			ubyte b = to!ubyte(uniform(0, 256, gen));
+			ubyte a = to!ubyte(255);
+			colors ~= [r, g, b, a] ;
 		}
 		
-		return ShapeGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, mesh);
-		
+		return mesh.add(vertices, indices, colors);
 	}
 	static ShapeGroup makeCube(UltraMesh mesh, double squareX, double squareY, double squareZ, double size) {
-		if (mesh.vertices.capacity() - 24 <= 0) {
-			mesh.vertices.reserve(mesh.vertices.data.length*2 + 24);
-		}
-		if (mesh.indices.capacity() - 36 <= 0) {
-			mesh.indices.reserve(mesh.indices.data.length*2 + 36);
-		}
-		if (color.capacity() - 24 <= 0) {
-			mesh.color.reserve(mesh.color.data.length*2 + 24);
-		}
-		int firstVertex = to!int(mesh.vertices.data.length);
-		int firstIndice = to!int(mesh.indices.data.length);
-		int firstColor = to!int(mesh.color.data.length);
-		
-		int n = to!int(mesh.vertices.data.length/3);
 		float s = size/2.0;
-		mesh.vertices.put(
-			[ -s+squareX, -s+squareY, s+squareZ, 
+		float[] vertices = [ -s+squareX, -s+squareY, s+squareZ, 
 				s+squareX, -s+squareY, s+squareZ, 
 				s+squareX, s+squareY, s+squareZ, 
 				-s+squareX, s+squareY, s+squareZ, 
 				-s+squareX, -s+squareY, -s+squareZ, 
 				s+squareX, -s+squareY, -s+squareZ, 
 				s+squareX, s+squareY, -s+squareZ, 
-				-s+squareX, s+squareY, -s+squareZ ] );
+				-s+squareX, s+squareY, -s+squareZ ];
 		
 		
 		//Add the lines to connect vertices
-		mesh.indices.put( [n,n+ 1,n+ 2,n+ 2,n+ 3,n+ 0,n+ 
-				3,n+ 2,n+ 6,n+ 6,n+ 7,n+ 3,n+ 
-				7,n+ 6,n+ 5,n+ 5,n+ 4,n+ 7,n+ 
-				4,n+ 0,n+ 3,n+ 3,n+ 7,n+ 4,n+ 
-				0,n+ 1,n+ 5,n+ 5,n+ 4,n+ 0,n+
-				1,n+ 5,n+ 6,n+ 6,n+ 2,n+ 1 ] );
+		int[] indices = [0, 1, 2, 2, 3, 0, 
+				3, 2, 6, 6, 7, 3, 
+				7, 6, 5, 5, 4, 7, 
+				4, 0, 3, 3, 7, 4, 
+				0, 1, 5, 5, 4, 0,
+				1, 5, 6, 6, 2, 1 ];
 		
-		//For each vertex we need a color R, G, B, 7
-		mesh.color.put( [colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA,
-				colorR, colorG, colorB, colorA] );
-		
-		int lastVertex = to!int(mesh.vertices.data.length);
-		int lastIndice = to!int(mesh.indices.data.length);
-		int lastColor = to!int(mesh.color.data.length);
-		
-		if (mesh.updateBuffers) {
-			mesh.updateIndiceBufferPartial(firstIndice, lastIndice-firstIndice);
-			mesh.updateVertexBufferPartial(firstVertex, lastVertex-firstVertex);
-			mesh.updateColorBufferPartial(firstColor, lastColor-firstColor);
+		//For each vertex we need a color R, G, B, A
+		ubyte[] colors = [];
+		Random gen;
+		for (int i = 0; i < vertices.length/3; i++) {
+			ubyte r = to!ubyte(uniform(0, 256, gen));
+			ubyte g = to!ubyte(uniform(0, 256, gen));
+			ubyte b = to!ubyte(uniform(0, 256, gen));
+			ubyte a = to!ubyte(255);
+			colors ~= [r, g, b, a];
 		}
 		
-		return ShapeGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, mesh);
+		return mesh.add(vertices, indices, colors);
+	}
+	static ShapeGroup makePolygon(UltraMesh mesh, double posX, double posY, double posZ, double radius, int segments) {
+		if (segments < 3) {segments = 3;}
+		float[] vertices = [];
+		vertices ~= [posX, posY, posZ]; //Center point
+		for (int i=0; i < segments; i++)
+		{
+			float degInRad = i*(PI*2)/segments;
+			double x = cos(degInRad)*radius;
+			double y = sin(degInRad)*radius;
+			vertices ~= [posX + x, posY + y, posZ];
+		}
 		
+		//Add the lines to connect vertices
+		int[] indices = [];
+		for (int i = 3; i < vertices.length-3; i+=3) {
+			indices ~= [0,
+						i/3,
+						i/3+1];
+		}
+		indices ~= [0, (to!int(vertices.length)-3)/3, 1]; //Final indice
+		
+		//For each vertex we need a color R, G, B, A
+		ubyte[] colors = [];
+		Random gen;
+		for (int i = 0; i < vertices.length/3; i++) {
+			ubyte r = to!ubyte(uniform(0, 256, gen));
+			ubyte g = to!ubyte(uniform(0, 256, gen));
+			ubyte b = to!ubyte(uniform(0, 256, gen));
+			ubyte a = to!ubyte(255);
+			colors ~= [r, g, b, a];
+		}
+		
+		return mesh.add(vertices, indices, colors);
+	}
+	static ShapeGroup makeCone(UltraMesh mesh, double posX, double posY, double posZ, double radius, double height, int segments) {
+		if (segments < 3) {segments = 3;}
+		float[] vertices = [];
+		vertices ~= [posX, posY, posZ - height/2]; //Center point
+		for (int i=0; i < segments; i++)
+		{
+			float degInRad = i*(PI*2)/segments;
+			double x = cos(degInRad)*radius;
+			double y = sin(degInRad)*radius;
+			vertices ~= [posX + x, posY + y, posZ - height/2];
+		}
+		vertices ~= [posX, posY, posZ + height/2];
+		
+		//Add the lines to connect vertices
+		int[] indices = [];
+		for (int i = 3; i < vertices.length-6; i+=3) {
+			indices ~= [0,
+				i/3,
+				i/3+1];
+		}
+		indices ~= [0, (to!int(vertices.length)-6)/3, 1]; //Final bottom indice
+
+		int topVertex = to!int(vertices.length)/3-1;
+		//Now connect to the top to form a pyramid
+		for (int i = 3; i < vertices.length-3; i+=3) {
+			indices ~= [topVertex,
+				i/3,
+				i/3+1];
+		}
+		indices ~= [topVertex, to!int(vertices.length)/3-2, 1]; //Final bottom indice
+
+		
+		//For each vertex we need a color R, G, B, A
+		ubyte[] colors = [];
+		Random gen;
+		for (int i = 0; i < vertices.length/3; i++) {
+			ubyte r = to!ubyte(uniform(0, 256, gen));
+			ubyte g = to!ubyte(uniform(0, 256, gen));
+			ubyte b = to!ubyte(uniform(0, 256, gen));
+			ubyte a = to!ubyte(255);
+			colors ~= [r, g, b, a];
+		}
+		
+		return mesh.add(vertices, indices, colors);
+	}
+
+	static ShapeGroup makeSphere(UltraMesh mesh, double posX, double posY, double posZ, double radius, int subdivision) {
+		float[] vertices = [];
+
+		// create 12 vertices of a icosahedron
+		float t = (1.0 + sqrt(5.0)) / 2.0; //Was 5.0
+		
+		vertices ~= [-1,  t,  0 ];
+		vertices ~= [ 1,  t,  0 ];
+		vertices ~= [-1, -t,  0 ];
+		vertices ~= [ 1, -t,  0 ];
+		
+		vertices ~= [ 0, -1,  t ];
+		vertices ~= [ 0,  1,  t ];
+		vertices ~= [ 0, -1, -t ];
+		vertices ~= [ 0,  1, -t ];
+		
+		vertices ~= [ t,  0, -1 ];
+		vertices ~= [ t,  0,  1 ];
+		vertices ~= [-t,  0, -1 ];
+		vertices ~= [-t,  0,  1 ];
+		
+		//Add the lines to connect vertices
+		int[] indices = [];
+		
+		// 5 faces around point 0
+		indices ~= [0, 11, 5 ];
+		indices ~= [0, 5, 1 ];
+		indices ~= [0, 1, 7 ];
+		indices ~= [0, 7, 10 ];
+		indices ~= [0, 10, 11 ];
+		
+		// 5 adjacent faces
+		indices ~= [1, 5, 9 ];
+		indices ~= [5, 11, 4 ];
+		indices ~= [11, 10, 2 ];
+		indices ~= [10, 7, 6 ];
+		indices ~= [7, 1, 8 ];
+		
+		// 5 faces around point 3
+		indices ~= [3, 9, 4 ];
+		indices ~= [3, 4, 2 ];
+		indices ~= [3, 2, 6 ];
+		indices ~= [3, 6, 8 ];
+		indices ~= [3, 8, 9 ];
+		
+		// 5 adjacent faces
+		indices ~= [4, 9, 5 ];
+		indices ~= [2, 4, 11 ];
+		indices ~= [6, 2, 10 ];
+		indices ~= [8, 6, 7 ];
+		indices ~= [9, 8, 1 ];
+		
+		//For each vertex we need a color R, G, B, A
+		ubyte[] colors = [];
+		Random gen;
+		for (int i = 0; i < vertices.length/3; i++) {
+			ubyte r = to!ubyte(uniform(0, 256, gen));
+			ubyte g = to!ubyte(uniform(0, 256, gen));
+			ubyte b = to!ubyte(uniform(0, 256, gen));
+			ubyte a = to!ubyte(255);
+			colors ~= [r, g, b, a];
+		}
+
+		//Move the vertices
+		for (int i = 0; i < vertices.length; i+=3) {
+			vertices[i] = vertices[i]*radius + posX;
+			vertices[i+1] = vertices[i+1]*radius + posY;
+			vertices[i+2] = vertices[i+2]*radius + posZ;
+		}
+
+		return mesh.add(vertices, indices, colors);
 	}
 }
-

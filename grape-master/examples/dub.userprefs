@@ -1,21 +1,24 @@
 ﻿<Properties StartupItem="dub.json">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="example" PreferredExecutionTarget="plain" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="src/example.d">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../import/grape/geometry.d">
     <Files>
-      <File FileName="src/example.d" Line="65" Column="1" />
+      <File FileName="src/example.d" Line="78" Column="25" />
       <File FileName="../import/grape/geometry.d" Line="1" Column="1" />
       <File FileName="../import/grape/material.d" Line="1" Column="1" />
       <File FileName="../import/grape/buffer.d" Line="1" Column="1" />
       <File FileName="../import/grape/math.d" Line="1" Column="1" />
-      <File FileName="src/UltraMesh.d" Line="263" Column="14" />
+      <File FileName="src/UltraMesh.d" Line="104" Column="4" />
       <File FileName="../import/grape/mesh.d" Line="1" Column="1" />
       <File FileName="../import/grape/renderer.d" Line="1" Column="1" />
       <File FileName="dub.selections.json" Line="1" Column="1" />
       <File FileName="dub.json" Line="1" Column="1" />
       <File FileName="../import/grape/surface.d" Line="1" Column="1" />
-      <File FileName="../import/grape/window.d" Line="106" Column="25" />
+      <File FileName="../import/grape/window.d" Line="1" Column="1" />
       <File FileName="../import/grape/shader.d" Line="1" Column="1" />
       <File FileName="../import/grape/camera.d" Line="1" Column="1" />
+      <File FileName="src/ShapeGroup.d" Line="92" Column="23" />
+      <File FileName="src/ShapeCreator.d" Line="233" Column="4" />
+      <File FileName="../import/grape/font.d" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

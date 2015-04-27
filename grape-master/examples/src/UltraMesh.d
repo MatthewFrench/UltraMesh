@@ -10,9 +10,11 @@ import std.conv;
 import std.algorithm;
 import std.array;
 import std.range;
+import src.ShapeGroup;
 
 class UltraMesh
 {
+private:
 	Appender!(float[]) vertices;
 	Appender!(int[]) indices;
 	Appender!(ubyte[]) color;
@@ -28,6 +30,36 @@ class UltraMesh
 	bool updateBuffers = true;
 	GLint cameraUniformLocation;
 	GLint vertexLocation, colorLocation;
+public:
+	void setAutoUpdateBuffers(bool val) {updateBuffers = val;}
+	void setWireframe(bool val) {wireframe = val;}
+	float[] getVertexData() {return vertices.data;}
+	int[] getIndiceData() {return indices.data;}
+	ubyte[] getColorData() {return color.data;}
+	int getVertexCount() {return to!int(getVertexData().length/3);};
+
+	ShapeGroup add(float[] newVertices, int[] newIndices, ubyte[] newColor) {
+		reserveVertexCapacity(to!int(newVertices.length));
+		reserveIndiceCapacity(to!int(newIndices.length));
+		reserveColorCapacity(to!int(newColor.length));
+
+		int firstVertex = to!int(getVertexData().length);
+		int firstIndice = to!int(getIndiceData().length);
+		int firstColor = to!int(getColorData().length);
+
+		vertices.put( newVertices );
+		int n = getVertexCount();
+		for (int i = 0; i < newIndices.length; i++) { //Add vertex count to indices
+			indices.put(newIndices[i] + n);
+		}
+		color.put( newColor );
+		
+		int lastVertex = to!int(getVertexData().length);
+		int lastIndice = to!int(getIndiceData().length);
+		int lastColor = to!int(getColorData().length);
+		return ShapeGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, this);
+	}
+
 	this()
 	{
 		if (program is null) {
@@ -93,17 +125,32 @@ class UltraMesh
 		glDeleteBuffers(1, &vertexBuffer);
 		glDeleteBuffers(1, &colorBuffer);
 	}
+	void reserveVertexCapacity(int amount) {
+		if (vertices.capacity()-amount <= 0) {
+			vertices.reserve(vertices.data.length*2 + amount);
+		}
+	}
+	void reserveIndiceCapacity(int amount) {
+		if (indices.capacity()-amount <= 0) {
+			indices.reserve(indices.data.length*2 + amount);
+		}
+	}
+	void reserveColorCapacity(int amount) {
+		if (color.capacity()-amount <= 0) {
+			color.reserve(color.data.length*2 + amount);
+		}
+	}
 	void updateAllBuffers() {
-		updateIndiceBufferPartial(0, to!int(indices.data.length));
-		updateVertexBufferPartial(0, to!int(vertices.data.length));
-		updateColorBufferPartial(0, to!int(color.data.length));
+		updateIndiceBufferPartial(0, to!int(indices.data.length), true);
+		updateVertexBufferPartial(0, to!int(vertices.data.length), true);
+		updateColorBufferPartial(0, to!int(color.data.length), true);
 	}
 	void updateColorBuffer() {
-		updateColorBufferPartial(0, to!int(color.data.length));
+		updateColorBufferPartial(0, to!int(color.data.length), true);
 	}void updateVertexBuffer() {
-		updateVertexBufferPartial(0, to!int(vertices.data.length));
+		updateVertexBufferPartial(0, to!int(vertices.data.length), true);
 	}void updateIndiceBuffer() {
-		updateIndiceBufferPartial(0, to!int(indices.data.length));
+		updateIndiceBufferPartial(0, to!int(indices.data.length), true);
 	}
 	void reserveIndiceBuffer(int length) {
 		indiceBufferSize = length;
@@ -111,18 +158,20 @@ class UltraMesh
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, int.sizeof*length, null, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
 	}
-	void updateIndiceBufferPartial(int start, int length) {
-		if (indiceBufferSize <= start+length) {
-			indiceBufferSize = to!int(indiceBufferSize * 2 + 3);
-			if (indiceBufferSize < start+length) {indiceBufferSize=start+length+3;}
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiceBuffer); 
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, int.sizeof*indiceBufferSize, null, GL_DYNAMIC_DRAW);
-			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.data.length*int.sizeof, indices.data.ptr);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
-		} else {
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiceBuffer);
-			glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start*int.sizeof, length*int.sizeof, indices.data[start..start+length].ptr);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
+	void updateIndiceBufferPartial(int start, int length, bool force=false) {
+		if (force || updateBuffers) {
+			if (indiceBufferSize <= start+length) {
+				indiceBufferSize = to!int(indiceBufferSize * 2 + 3);
+				if (indiceBufferSize < start+length) {indiceBufferSize=start+length+3;}
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiceBuffer); 
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, int.sizeof*indiceBufferSize, null, GL_DYNAMIC_DRAW);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indices.data.length*int.sizeof, indices.data.ptr);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
+			} else {
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiceBuffer);
+				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, start*int.sizeof, length*int.sizeof, indices.data[start..start+length].ptr);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
+			}
 		}
 	}
 
@@ -132,7 +181,8 @@ class UltraMesh
 		glBufferData(GL_ARRAY_BUFFER, float.sizeof*length, null, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	void updateVertexBufferPartial(int start, int length) {
+	void updateVertexBufferPartial(int start, int length, bool force = false) {
+		if (force || updateBuffers) {
 		if (vertexBufferSize <= start+length) {
 			vertexBufferSize = to!int(vertexBufferSize * 2 + 9);
 			if (vertexBufferSize < start+length) {vertexBufferSize=start+length+9;}
@@ -145,6 +195,7 @@ class UltraMesh
 			glBufferSubData(GL_ARRAY_BUFFER, start*float.sizeof, length*float.sizeof, vertices.data[start..start+length].ptr);
 			glBindBuffer(GL_ARRAY_BUFFER, 0); 
 		}
+		}
 	}
 	void reserveColorBuffer(int length) {
 		colorBufferSize = length;
@@ -152,18 +203,20 @@ class UltraMesh
 		glBufferData(GL_ARRAY_BUFFER, byte.sizeof*length, null, GL_DYNAMIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0); 
 	}
-	void updateColorBufferPartial(int start, int length) {
-		if (colorBufferSize <= start+length) {
-			colorBufferSize = to!int(colorBufferSize * 2 + 12);
-			if (colorBufferSize < start+length) {colorBufferSize=start+length+12;}
-			glBindBuffer(GL_ARRAY_BUFFER, colorBuffer); 
-			glBufferData(GL_ARRAY_BUFFER, byte.sizeof*colorBufferSize, null, GL_DYNAMIC_DRAW);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, color.data.length*byte.sizeof, color.data.ptr);
-			glBindBuffer(GL_ARRAY_BUFFER, 0); 
-		} else {
-			glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-			glBufferSubData(GL_ARRAY_BUFFER, start*byte.sizeof, length*byte.sizeof, color.data[start..start+length].ptr);
-			glBindBuffer(GL_ARRAY_BUFFER, 0); 
+	void updateColorBufferPartial(int start, int length, bool force = false) {
+		if (force || updateBuffers) {
+			if (colorBufferSize <= start+length) {
+				colorBufferSize = to!int(colorBufferSize * 2 + 12);
+				if (colorBufferSize < start+length) {colorBufferSize=start+length+12;}
+				glBindBuffer(GL_ARRAY_BUFFER, colorBuffer); 
+				glBufferData(GL_ARRAY_BUFFER, byte.sizeof*colorBufferSize, null, GL_DYNAMIC_DRAW);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, color.data.length*byte.sizeof, color.data.ptr);
+				glBindBuffer(GL_ARRAY_BUFFER, 0); 
+			} else {
+				glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
+				glBufferSubData(GL_ARRAY_BUFFER, start*byte.sizeof, length*byte.sizeof, color.data[start..start+length].ptr);
+				glBindBuffer(GL_ARRAY_BUFFER, 0); 
+			}
 		}
 	}
 

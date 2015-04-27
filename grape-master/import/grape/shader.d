@@ -341,7 +341,7 @@ class Shader {
 		//writeln("Shader code: ", fst);
       glCompileShader(_shader);
 
-		char log[512];
+		char[512] log;
 		glGetShaderInfoLog(_shader, 512, null, cast(char*)log);
 		writeln(log);
 
