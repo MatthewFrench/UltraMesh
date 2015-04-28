@@ -19,7 +19,6 @@ private:
 	Appender!(int[]) indices;
 	Appender!(ubyte[]) color;
 	bool wireframe;
-	ubyte colorR, colorB, colorG, colorA;
 	GLuint indiceBuffer;
 	GLuint vertexBuffer;
 	GLuint colorBuffer;
@@ -37,26 +36,32 @@ public:
 	int[] getIndiceData() {return indices.data;}
 	ubyte[] getColorData() {return color.data;}
 	int getVertexCount() {return to!int(getVertexData().length/3);};
+	int getTriangleCount() {return to!int(getIndiceData().length/3);};
 
-	ShapeGroup add(float[] newVertices, int[] newIndices, ubyte[] newColor) {
-		reserveVertexCapacity(to!int(newVertices.length));
-		reserveIndiceCapacity(to!int(newIndices.length));
-		reserveColorCapacity(to!int(newColor.length));
+	ShapeGroup add(Point[] newVertices, Indice[] newIndices, Color[] newColor) {
+		reserveVertexCapacity(to!int(newVertices.length*3));
+		reserveIndiceCapacity(to!int(newIndices.length*3));
+		reserveColorCapacity(to!int(newColor.length*4));
 
 		int firstVertex = to!int(getVertexData().length);
 		int firstIndice = to!int(getIndiceData().length);
 		int firstColor = to!int(getColorData().length);
 
-		vertices.put( newVertices );
 		int n = getVertexCount();
-		for (int i = 0; i < newIndices.length; i++) { //Add vertex count to indices
-			indices.put(newIndices[i] + n);
+		for (int i = 0; i < newVertices.length; i++) {
+			vertices.put([newVertices[i].x,newVertices[i].y,newVertices[i].z]);
 		}
-		color.put( newColor );
-		
+
+		for (int i = 0; i < newIndices.length; i++) { //Add vertex count to indices
+			indices.put([newIndices[i].v1 + n, newIndices[i].v2 + n, newIndices[i].v3 + n]);
+		}
+		for (int i = 0; i < newColor.length; i++) {
+			color.put( [newColor[i].r, newColor[i].g, newColor[i].b, newColor[i].a] );
+		}
 		int lastVertex = to!int(getVertexData().length);
 		int lastIndice = to!int(getIndiceData().length);
 		int lastColor = to!int(getColorData().length);
+
 		return ShapeGroup(firstVertex, lastVertex, firstColor, lastColor, firstIndice, lastIndice, this);
 	}
 
@@ -66,10 +71,6 @@ public:
 			initializeShader();
 		}
 		wireframe = false;
-		colorR = to!ubyte(255);
-		colorB = to!ubyte(0);
-		colorG = to!ubyte(0);
-		colorA = to!ubyte(255);
 		vertices = appender!(float[]); //Points
 		indices = appender!(int[]); //Edges
 		color = appender!(ubyte[]);
@@ -268,3 +269,13 @@ static immutable fragmentShaderSource = q{
 		FragColor = vColor;
 	}
 };
+
+struct Point {
+	double x, y, z;
+}
+struct Indice {
+	int v1, v2, v3;
+}
+struct Color {
+	ubyte r, g, b, a;
+}

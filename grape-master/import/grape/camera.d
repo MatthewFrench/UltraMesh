@@ -6,6 +6,15 @@ import std.stdio;
 import grape.math;
 import grape.window : WINDOW_WIDTH, WINDOW_HEIGHT;
 
+
+
+
+
+//I need to move and rotate the camera relative to the direction it is facing.
+
+
+
+
 class Camera {
   public :
     /**
@@ -16,7 +25,80 @@ class Camera {
      * center: 注視点
      * up:     上方向
      */
+	void moveForward(float speed)
+	{
+		Vec3 vVector = mView - mPos;
+
+		mPos = Vec3(mPos.x + vVector.x * speed, mPos.y + vVector.y * speed,mPos.z + vVector.z * speed);
+		mView = Vec3(mView.x + vVector.x * speed, mView.y + vVector.y * speed, mView.z + vVector.z * speed);
+
+		look_at(mPos, mView, mUp);
+	}
+	void moveSide(float speed) {
+		Vec3 vVector = mView-mPos;
+		
+		mPos = Vec3(mPos.x + vVector.x * speed, mPos.y - vVector.y * speed,mPos.z);
+		mView = Vec3(mView.x + vVector.x * speed, mView.y - vVector.y * speed, mView.z);
+		
+		look_at(mPos, mView, mUp);
+	}
+
+	void rotateX(float speed)
+	{
+		Vec3 vVector = mView - mPos;    // Get the view vector
+		
+		float s = sin(speed);
+		float c = cos(speed);
+
+		float y = vVector.y;
+		float z = vVector.z;
+		
+		mView = Vec3(mView.x,
+			y * c - z * s +  mPos.y,
+			z * c + y * s + mPos.z);
+		
+		look_at(mPos, mView, mUp);
+	}
+	
+	void rotateZ(float speed)
+	{
+		Vec3 vVector = mView - mPos;    // Get the view vector
+
+		float s = sin(speed);
+		float c = cos(speed);
+
+		float x = vVector.x;
+		float y = vVector.y;
+
+		mView = Vec3(x * c + y * s + mPos.x,
+			y * c - x * s +  mPos.y,
+			mView.z);
+			
+		look_at(mPos, mView, mUp);
+	}
+	
+	
+	void moveCameraHorizontal(float speed)    // MOVE LEFT AND RIGHT
+	{
+		Vec3 vVector = mView - mPos;    // Get the view vector
+		
+		Vec3 vOrthoVector; // Orthogonal vector for the view vector
+
+		vOrthoVector = Vec3(-vVector.z, 0, vVector.x);
+
+		mPos = Vec3(mPos.x + vOrthoVector.x * speed,
+			0,
+			mPos.z + vOrthoVector.z * speed);
+		mView = Vec3(mView.x + vOrthoVector.x * speed,
+			0,
+			mView.z + vOrthoVector.z * speed);
+			
+		look_at(mPos, mView, mUp);
+	}
     void look_at(Vec3 eye, Vec3 center, Vec3 up) {
+		mPos = eye;
+		mView = center;
+		mUp = up;
       Vec3 f = Vec3(center.x-eye.x, center.y-eye.y, center.z-eye.z);
 
       f.normalize;
@@ -44,6 +126,7 @@ class Camera {
 
   protected:
     Mat4 _proj, _view;
+	Vec3 mPos, mView, mUp;
 }
 
 class PerspectiveCamera : Camera {

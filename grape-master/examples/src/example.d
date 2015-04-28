@@ -23,6 +23,7 @@ double width = (1280);
 double height = (800-22);
 bool loop = true;
 bool pressedLeft = false, pressedRight = false, pressedDown = false, pressedUp = false, zoomIn = false, zoomOut = false;
+bool pressedW = false, pressedS = false, pressedD = false, pressedA = false;
 double cameraX = 0.0;
 double cameraY = 0.0;
 double cameraZ = 0.0;
@@ -59,6 +60,15 @@ void initCore() {
 	Input.key_down(KEY_RIGHT, { pressedRight = true; });
 	Input.key_up(KEY_RIGHT, { pressedRight = false; });
 
+	Input.key_down(KEY_W, { pressedW = true; });
+	Input.key_up(KEY_W, { pressedW = false; });
+	Input.key_down(KEY_S, { pressedS = true; });
+	Input.key_up(KEY_S, { pressedS = false; });
+	Input.key_down(KEY_A, { pressedA = true; });
+	Input.key_up(KEY_A, { pressedA = false; });
+	Input.key_down(KEY_D, { pressedD = true; });
+	Input.key_up(KEY_D, { pressedD = false; });
+
 	Input.key_down(KEY_Z, { zoomIn = true; });
 	Input.key_up(KEY_Z, { zoomIn = false; });
 	Input.key_down(KEY_X, { zoomOut = true; });
@@ -70,22 +80,21 @@ void initUltraMesh() {
 
 	ultraMesh.setAutoUpdateBuffers(false);
 	double cubeSize = 1.0;
-	for (int i = 0; i < 50; i++) {
-		for (int y = 0; y < 50; y ++) {
+	for (int i = 0; i < 100; i++) {
+		for (int y = 0; y < 100; y ++) {
 			double zOff = uniform(0, 1000, gen)/1000.0/2;
 			for (int z = -10; z < 0; z++) {
-				double cubeX = -i+5;
-				double cubeY = -y+5;
-				double cubeZ = zOff+z;
-				ShapeGroup cube = ShapeCreator.makeSphere(ultraMesh, cubeX, cubeY, cubeZ, cubeSize, 10);
-					//makeCube(ultraMesh, cubeX, cubeY, cubeZ, cubeSize);
-				cube.setScale(0.15, 0.15, 0.15);
-				groups ~= cube;
+				Point position = Point(-i, -y, zOff+z);
+				ShapeGroup shape = ShapeCreator.makeTriangle(ultraMesh, position, cubeSize);
+				shape.setScale(0.15, 0.15, 0.15);
+				groups ~= shape;
 				vel ~= Vec3(uniform(0, 1000, gen)/10000.0-0.05, uniform(0, 1000, gen)/10000.0-0.05, uniform(0, 1000, gen)/10000.0-0.05);
 			}
 		}
 	}
 	writeln("Shape Count: ", groups.length);
+	writeln("Triangle Count: ", ultraMesh.getTriangleCount());
+	writeln("Vertext Count: ", ultraMesh.getVertexCount());
 	ultraMesh.updateAllBuffers();
 	ultraMesh.setWireframe(false);
 }
@@ -97,20 +106,42 @@ void animate() {
 	float scaleSpeed = 0.01;
 	while (loop) {
 		Input.poll();
-		if (pressedLeft) cameraX += 0.1;
-		if (pressedRight) cameraX -= 0.1;
-		if (pressedUp) cameraY -= 0.1;
-		if (pressedDown) cameraY += 0.1;
+		if (pressedLeft) {
+			camera.moveSide(-0.1);
+		}
+
+		if (pressedRight) {
+			camera.moveSide(0.1);
+		}
+		if (pressedUp) {
+			camera.moveForward(0.1);
+		}
+		if (pressedDown) {
+			camera.moveForward(-0.1);
+		}
+		if (pressedA) {
+			camera.rotateZ(-0.1);
+		}
+		if (pressedD) {
+			camera.rotateZ(0.1);
+		}
+		if (pressedW) {
+			camera.rotateX(0.1);
+		}
+		if (pressedS) {
+			camera.rotateX(-0.1);
+		}
 		if (zoomIn) cameraZ -= 0.1;
 		if (zoomOut) cameraZ += 0.1;
+		/*
 		if (pressedLeft || pressedRight || pressedDown || pressedUp || zoomIn || zoomOut) {
 			Vec3 cameraPosition = Vec3(cameraX+4, cameraY+3, cameraZ+3);
 			Vec3 cameraLookingAt = Vec3(cameraX, cameraY, cameraZ);
 			Vec3 cameraUp = Vec3(0, 0, 1);
 			camera.look_at(cameraPosition, cameraLookingAt, cameraUp);
-		}
+		}*/
 		rot += 0.1;
-		/*
+
 		if (scaleIncreasing) {
 			scale += scaleSpeed;
 			if (scale > 1.0) {
@@ -123,9 +154,9 @@ void animate() {
 				scale = 0.01;
 				scaleIncreasing = true;
 			}
-		}*/
+		}
 		for (int i = 0; i < groups.length; i++) {
-			//groups[i].setScale(scale, scale, scale);
+			groups[i].setScale(scale, scale, scale);
 
 			//groups[i].setRotation(rot, rot, rot);
 			groups[i].setRotationZ(rot/2);
@@ -133,7 +164,7 @@ void animate() {
 			//groups[i].rotateX(0.005);
 			//groups[i].rotateX(uniform(0, 1000, gen)/1000.0);
 			//groups[i].rotateY(uniform(0, 1000, gen)/1000.0);
-			/*
+
 			groups[i].moveX(vel[i].x);
 			groups[i].moveY(vel[i].y);
 			groups[i].moveZ(vel[i].z);
@@ -166,7 +197,7 @@ void animate() {
 				groups[i].setPosition(groups[i].centerX, groups[i].centerY, -45);
 				vel[i] = Vec3(vel[i].x,vel[i].y,-vel[i].z);
 				groups[i].setColor(uniform(0, 1000, gen)/1000.0, uniform(0, 1000, gen)/1000.0, uniform(0, 1000, gen)/1000.0, 1.0);
-			}*/
+			}
 		}
 		ultraMesh.updateVertexBuffer();
 		ultraMesh.updateColorBuffer();
