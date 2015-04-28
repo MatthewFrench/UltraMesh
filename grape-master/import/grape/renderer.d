@@ -86,7 +86,7 @@ class Renderer {
       }
     }
 
-    void render(Scene scene, Camera camera) {
+	void render(Scene scene, CameraOld camera) {
       foreach (i, mesh; scene.meshes) {
         auto geometry = mesh.geometry;
         auto material = mesh.material;
@@ -131,12 +131,12 @@ class Renderer {
     }
 
   private:
-    void render_impl_shader(ShaderProgram program, Geometry geometry, Material material, Camera camera) {
+	void render_impl_shader(ShaderProgram program, Geometry geometry, Material material, CameraOld camera) {
       float[] position;
 
       // VBO: Position
       foreach (vec3; geometry.vertices) {
-        position ~= vec3.coord;
+        //position ~= vec3.coord;
       }
 
       // IBO Setting
@@ -186,7 +186,7 @@ class Renderer {
       });
     }
 
-    void render_impl_color(ShaderProgram program, Geometry geometry, Material material, Camera camera) {
+	void render_impl_color(ShaderProgram program, Geometry geometry, Material material, CameraOld camera) {
       float[] position;
       float[] color;
 
@@ -210,7 +210,7 @@ class Renderer {
 		geometry.setVBOs(program);
 
       // Uniform Setting
-      UniformLocationN.attach(program, "pvmMatrix", camera.pvMat4.mat, "mat4fv");
+      //UniformLocationN.attach(program, "pvmMatrix", camera.pvMat4.mat, "mat4fv");
 
       // Wireframe Checking
       auto wireframePtr = material.params["wireframe"].peek!(bool);
@@ -223,19 +223,19 @@ class Renderer {
 
     }
 
-    void render_impl_diffuse(ShaderProgram program, Geometry geometry, Material material, Camera camera) {
+	void render_impl_diffuse(ShaderProgram program, Geometry geometry, Material material, CameraOld camera) {
       float[] position;
       float[] normal;
       float[] color;
 
       // VBO: Position
       foreach (vec3; geometry.vertices) {
-        position ~= vec3.coord;
+        //position ~= vec3.coord;
       }
 
       // VBO: Normal
       foreach (vec3; geometry.normals) {
-        normal ~= vec3.coord;
+        //normal ~= vec3.coord;
       }
 
       // VBO: Color
@@ -254,8 +254,8 @@ class Renderer {
       _vboList[2].set(program, normal, "normal", 3, 2);
 
       // Uniform Setting
-      UniformLocationN.attach(program, "pvmMatrix", camera.pvMat4.mat, "mat4fv");
-      UniformLocationN.attach(program, "invMatrix", camera.pvMat4.inverse.mat, "mat4fv");
+      //UniformLocationN.attach(program, "pvmMatrix", camera.pvMat4.mat, "mat4fv");
+      //UniformLocationN.attach(program, "invMatrix", camera.pvMat4.inverse.mat, "mat4fv");
       // TODO sceneの中にlight置くようにする
       UniformLocationN.attach(program, "lightPosition", [2.0f, 2.0f, -2.0f], "3fv");
 
@@ -269,14 +269,14 @@ class Renderer {
       _ibo.draw(*drawModePtr);
     }
 
-    void render_impl_ads(ShaderProgram program, Geometry geometry, Material material, Camera camera) {
+	void render_impl_ads(ShaderProgram program, Geometry geometry, Material material, CameraOld camera) {
       float[] position;
       float[] color;
       float[] normal;
 
       // VBO: Position
       foreach (vec3; geometry.vertices) {
-        position ~= vec3.coord;
+        //position ~= vec3.coord;
       }
 
       // VBO: Color
@@ -288,7 +288,7 @@ class Renderer {
 
       // VBO: Normal
       foreach (vec3; geometry.normals) {
-        normal ~= vec3.coord;
+        //normal ~= vec3.coord;
       }
 
       // IBO Setting
@@ -306,8 +306,8 @@ class Renderer {
       float[4] ambientColor = tmp2 ~ 1.0;
 
       // Uniform Setting
-      UniformLocationN.attach(program, "pvmMatrix", camera.pvMat4.mat, "mat4fv");
-      UniformLocationN.attach(program, "invMatrix", camera.pvMat4.inverse.mat, "mat4fv");
+      //UniformLocationN.attach(program, "pvmMatrix", camera.pvMat4.mat, "mat4fv");
+      //UniformLocationN.attach(program, "invMatrix", camera.pvMat4.inverse.mat, "mat4fv");
       // TODO sceneの中にlight置くようにする
       UniformLocationN.attach(program, "lightPosition", [2.0f, 2.0f, -2.0f], "3fv");
       // TODO camera実装してcameraの位置入れる
@@ -328,7 +328,7 @@ class Renderer {
     int MaxNumVBO = 10;
     VBO[] _vboList;
     IBO _ibo;
-    static void delegate(ShaderProgram, Geometry, Material, Camera)[string] _renderImplCaller;
+	static void delegate(ShaderProgram, Geometry, Material, CameraOld)[string] _renderImplCaller;
 }
 
 /**

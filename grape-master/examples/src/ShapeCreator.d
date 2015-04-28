@@ -14,6 +14,9 @@ class ShapeCreator
 	static ShapeGroup makeShape(UltraMesh mesh, Point[] vertices, Indice[] indices, Color[] colors) {
 		return mesh.add(vertices, indices, colors);
 	}
+	//static ShapeGroup makeShapeFromShape(UltraMesh mesh, ShapeGroup shape) {
+	//	return null;
+	//}
 	static ShapeGroup makeTriangle(UltraMesh mesh, Point position, double width) {
 		Point[] vertices = [Point(position.x-width/2.0, position.y-width/2.0, position.z),
 			Point(position.x+width/2.0, position.y-width/2.0, position.z),
@@ -35,12 +38,12 @@ class ShapeCreator
 		return mesh.add(vertices, indices, colors);
 	}
 	
-	static ShapeGroup makeSquare(UltraMesh mesh, Point position, double size) {
+	static ShapeGroup makeRectangle(UltraMesh mesh, Point position, double width, double height) {
 		Point[] vertices = 
-		[ Point(position.x-size/2.0, position.y-size/2.0, position.z),
-			Point(position.x-size/2.0, position.y+size/2.0, position.z),
-			Point(position.x+size/2.0, position.y-size/2.0, position.z),
-			Point(position.x+size/2.0, position.y+size/2.0, position.z)];
+		[ Point(position.x-width/2.0, position.y-height/2.0, position.z),
+			Point(position.x-width/2.0, position.y+height/2.0, position.z),
+			Point(position.x+width/2.0, position.y-height/2.0, position.z),
+			Point(position.x+width/2.0, position.y+height/2.0, position.z)];
 
 		//Add the lines to connect vertices
 		Indice[] indices = [Indice(0, 1, 2), Indice(3, 2, 1)];
@@ -58,16 +61,15 @@ class ShapeCreator
 		
 		return mesh.add(vertices, indices, colors);
 	}
-	static ShapeGroup makeCube(UltraMesh mesh, Point position, double size) {
-		float s = size/2.0;
-		Point[] vertices = [ Point(-s+position.x, -s+position.y, s+position.z), 
-			Point(s+position.x, -s+position.y, s+position.z), 
-			Point(s+position.x, s+position.y, s+position.z), 
-			Point(-s+position.x, s+position.y, s+position.z), 
-			Point(-s+position.x, -s+position.y, -s+position.z), 
-			Point(s+position.x, -s+position.y, -s+position.z), 
-			Point(s+position.x, s+position.y, -s+position.z), 
-			Point(-s+position.x, s+position.y, -s+position.z) ];
+	static ShapeGroup makeBox(UltraMesh mesh, Point position, double width, double height, double depth) {
+		Point[] vertices = [ Point(-width/2+position.x, -height/2+position.y, depth/2+position.z), 
+			Point(width/2+position.x, -height/2+position.y, depth/2+position.z), 
+			Point(width/2+position.x, height/2+position.y, depth/2+position.z), 
+			Point(-width/2+position.x, height/2+position.y, depth/2+position.z), 
+			Point(-width/2+position.x, -height/2+position.y, -depth/2+position.z), 
+			Point(width/2+position.x, -height/2+position.y, -depth/2+position.z), 
+			Point(width/2+position.x, height/2+position.y, -depth/2+position.z), 
+			Point(-width/2+position.x, height/2+position.y, -depth/2+position.z) ];
 
 		
 		//Add the lines to connect vertices

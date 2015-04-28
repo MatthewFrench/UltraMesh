@@ -5,6 +5,7 @@ import std.math;
 import std.stdio;
 import grape.math;
 import grape.window : WINDOW_WIDTH, WINDOW_HEIGHT;
+import gl3n.linalg;
 
 
 
@@ -15,7 +16,7 @@ import grape.window : WINDOW_WIDTH, WINDOW_HEIGHT;
 
 
 
-class Camera {
+class CameraOld {
   public :
     /**
      * 位置、姿勢の設定
@@ -104,8 +105,8 @@ class Camera {
       f.normalize;
       up.normalize;
 
-      Vec3 s = f.cross(up);
-      Vec3 u = s.cross(f);
+		Vec3 s = cross(f,up);
+		Vec3 u = cross(s,f);
 
       _view = Mat4( s.x, u.x, -f.x, 0,
                     s.y, u.y, -f.y, 0,
@@ -120,7 +121,7 @@ class Camera {
        * 基本的にこれをuniformのpvmMatrixに送ります。
        */
       Mat4 pvMat4() {
-        return _proj.multiply(_view);
+        return _proj*_view;
       }
     }
 
@@ -129,10 +130,10 @@ class Camera {
 	Vec3 mPos, mView, mUp;
 }
 
-class PerspectiveCamera : Camera {
+class PerspectiveCamera : CameraOld {
   public:
-    this(in float fovy, in float aspect, in float near, in float far) {
-      perspective(fovy, aspect, near, far);
+	this(in float fovy, in float width, in float height, in float near, in float far) {
+      perspective(fovy, width, height, near, far);
     }
 
     /**
@@ -144,24 +145,29 @@ class PerspectiveCamera : Camera {
      * near:   一番近いz座標
      * far:    一番遠いz座標
      */
-    void perspective(in float fovy, in float aspect, in float near, in float far) {
+    void perspective(in float fovy, in float width, in float height, in float near, in float far) {
       // translate to grape.math
+
+		_proj=mat4.perspective(width, height, fovy, near, far);
+		/*
       auto cot = delegate float(float x){ return 1 / tan(x); };
       auto f = cot(fovy/2);
 
       _proj.set( f/aspect, 0, 0, 0,
                  0, f, 0, 0,
                  0, 0, (far+near)/(near-far), -1,
-                 0, 0, (2*far*near)/(near-far), 0 );
+                 0, 0, (2*far*near)/(near-far), 0 );(*/
     }
 }
 
-class OrthographicCamera : Camera {
+class OrthographicCamera : CameraOld {
   this(in float left, in float right, in float top, in float bottom, in float near, in float far) {
     orthographic(left, right, top, bottom, near, far);
   }
 
   void orthographic(in float left, in float right, in float top, in float bottom, in float near, in float far) {
+		_proj = mat4.orthographic(left, right, bottom, top, near, far);
+		/*
     auto a = 2 / (right - left);
     auto b = 2 / (top - bottom);
     auto c = -2 / (far - near);
@@ -169,10 +175,11 @@ class OrthographicCamera : Camera {
     auto ty = -(top + bottom) / (top - bottom);
     auto tz = -(far + near) / (far - near);
 
+
     _proj.set( a, 0, 0, 0,
                0, b, 0, 0,
                0, 0, c, 0,
-               tx, ty, tz, 1 );
+               tx, ty, tz, 1 );*/
   }
 
 }

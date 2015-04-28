@@ -32,7 +32,7 @@ struct CoordinateSystem {
     }
 
     void set_position(Vec3 x, Vec3 y, Vec3 z) {
-      _list = [ Quat(x), Quat(y), Quat(z) ];
+		_list = [ Quat(1.0,x), Quat(1.0,y), Quat(1.0,z) ];
     }
 
     void set_position(Quat x, Quat y, Quat z) {
@@ -40,37 +40,40 @@ struct CoordinateSystem {
     }
 
     void rotate(Quat rotQuat) {
-      _list = map!(pos => rotQuat.conjugate * pos * rotQuat)(_list).array;
+      //_list = map!(pos => rotQuat.conjugate() * pos * rotQuat)(_list).array;
     }
 
     @property {
       Vec3 x() {
-        return _list[0].vec3;
+        //return _list[0].vec3;
+			return Vec3(0,0,0);
       }
 
       Vec3 y() {
-        return _list[1].vec3;
+        //return _list[1].vec3;
+			return Vec3(0,0,0);
       }
 
       Vec3 z() {
-        return _list[2].vec3;
+			//return _list[2].vec3;return null;
+			return Vec3(0,0,0);
       }
     }
 
   private:
-    Quat[] _list = [ Quat(Vec3(1, 0, 0)),
-                     Quat(Vec3(0, 1, 0)),
-                     Quat(Vec3(0, 0, 1)) ];
+    Quat[] _list = [ Quat(0.0,Vec3(1, 0, 0)),
+		Quat(0.0,Vec3(0, 1, 0)),
+		Quat(0.0,Vec3(0, 0, 1)) ];
 }
 
 // TODO atomic
 class Geometry {
   public:
     void set_position(Vec3 vec3) {
-      auto distance = vec3 - _origin.vec3;
+      //auto distance = vec3 - _origin.vec3;
 
-      _origin.set(_origin.vec3 + distance);
-      _vertices = map!(x => x + distance)(_vertices).array; 
+      //_origin.set(_origin.vec3 + distance);
+      //_vertices = map!(x => x + distance)(_vertices).array; 
     }
 
     void forward(in float distance) {
@@ -104,15 +107,15 @@ class Geometry {
     }
 
     void pitch(in float rad) {
-      rotate_impl(_localCS.x, rad, _origin.vec3);
+      //r//otate_impl(_localCS.x, rad, _origin.vec3);
     }
 
     void yaw(in float rad) {
-      rotate_impl(_localCS.y, rad, _origin.vec3);
+      //rotate_impl(_localCS.y, rad, _origin.vec3);
     }
 
     void roll(in float rad) {
-      rotate_impl(_localCS.z, rad, _origin.vec3);
+      //rotate_impl(_localCS.z, rad, _origin.vec3);
     }
 
     // 任意の直線の方向に移動
@@ -139,7 +142,7 @@ class Geometry {
 			geometryChanged = false;
 			position = [];
 			foreach (vec3; vertices) {
-				  position ~= vec3.coord;
+				  //position ~= vec3.coord;
 			}
 		}
 		return position;
@@ -207,11 +210,12 @@ class Geometry {
       foreach (ref vertex; _vertices) {
         vertex += distanceVec3;
       }
-      _origin.set(_origin.vec3 + distanceVec3);
+      //_origin.set(_origin.vec3 + distanceVec3);
     }
 
     void rotate_impl(in Vec3 axis, in float rad, in Vec3 pos) {
       void delegate() impl = {
+			/*
         auto rotQuat = Quat(axis, rad);
 
         // _originの回転
@@ -227,6 +231,7 @@ class Geometry {
         // _normalsの回転
         auto tmp2 = map!(vec3 => Quat(vec3))(_normals);
         _normals = map!(pos => (rotQuat.conjugate * pos * rotQuat).vec3)(tmp2).array;
+        */
       };
 
       _vertices = map!(x => x - pos)(_vertices).array;
@@ -235,7 +240,7 @@ class Geometry {
     }
 
     CoordinateSystem _localCS;
-    Quat _origin = Quat(Vec3(0, 0, 0));
+    Quat _origin = Quat(0.0,Vec3(0, 0, 0));
     Vec3[] _vertices;
     int[] _indices;
     Vec3[] _normals;

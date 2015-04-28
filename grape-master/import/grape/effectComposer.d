@@ -94,7 +94,7 @@ class Pass {
     }
 
     Scene _scene;
-    Camera _camera;
+	CameraOld _camera;
     PlaneGeometry _geometry;
     Mesh _screen;
 
@@ -104,7 +104,7 @@ class Pass {
 
 class RenderPass : Pass {
   public:
-    this(Scene scene, Camera camera) {
+	this(Scene scene, CameraOld camera) {
       _scene = scene;
       _camera = camera;
     }

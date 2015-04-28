@@ -11,6 +11,8 @@ import std.algorithm;
 import std.array;
 import std.range;
 import src.ShapeGroup;
+import gl3n.math;
+import src.Camera;
 
 class UltraMesh
 {
@@ -225,7 +227,7 @@ public:
 		program.use();
 		
 		//Set the camera location uniform
-		glUniformMatrix4fv(cameraUniformLocation, 1, GL_FALSE, camera.pvMat4.mat.ptr);
+		glUniformMatrix4fv(cameraUniformLocation, 1, GL_TRUE, camera.perspectiveView().value_ptr);
 
 		// Wireframe Checking
 		if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

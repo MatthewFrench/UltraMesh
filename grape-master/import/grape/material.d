@@ -263,7 +263,7 @@ class ShaderMaterial : Material {
           gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
         }
       };
-      _params["uniforms"] = [ "pvmMatrix": [ "type": UniformType("mat4v"), "value": UniformType((new Camera).pvMat4.mat) ] ];
+	//_params["uniforms"] = [ "pvmMatrix": [ "type": UniformType("mat4v"), "value": UniformType((new Camera).pvMat4().value_ptr) ] ];
       _params["attributes"] = [ "position": [ "type": AttributeType(3), "value": AttributeType([ 0.0f, 0.0f, 0.0f ]) ] ];
       _params["map"] = new Texture;
     }

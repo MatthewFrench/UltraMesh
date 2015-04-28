@@ -28,6 +28,61 @@ struct ShapeGroup
 		vg.calculateCenter();
 		return vg;
 	}
+	int getVertexCount() {
+		return (lastVertex - firstVertex)/3;
+	}
+	int getIndiceCount() {
+		return (lastIndice - firstIndice)/3;
+	}
+	int getColorCount() {
+		return (lastColor - firstColor)/4;
+	}
+	float[] getVertexData() {
+		float[] vertexData = ultraMesh.getVertexData();
+		return vertexData[firstVertex..lastVertex];
+	}
+	ubyte[] getColorData() {
+		ubyte[] colorData = ultraMesh.getColorData();
+		return colorData[firstColor..lastColor];
+	}
+	int[] getIndiceData() {
+		int[] indiceData = ultraMesh.getIndiceData();
+		return indiceData[firstIndice..lastIndice];
+	}
+	Point getVertex(int vertexNum) {
+		float[] vertexData = ultraMesh.getVertexData();
+		return Point(vertexData[firstVertex+vertexNum*3],vertexData[firstVertex+vertexNum*3+1],vertexData[firstVertex+vertexNum*3+2]);
+	}
+	void setVertex(int vertexNum, Point vertex) {
+		float[] vertexData = ultraMesh.getVertexData();
+		vertexData[firstVertex+vertexNum*3] = vertex.x;
+		vertexData[firstVertex+vertexNum*3+1] = vertex.y;
+		vertexData[firstVertex+vertexNum*3+2] = vertex.z;
+		ultraMesh.updateVertexBufferPartial(vertexNum, 1*3);
+	}
+	Color getColor(int num) {
+		ubyte[] color = ultraMesh.getColorData();
+		return Color(color[firstColor+num*4],color[firstColor+num*4+1],color[firstColor+num*4+2],color[firstColor+num*4+3]);
+	}
+	void setColor(int num, Color color) {
+		ubyte[] colorData = ultraMesh.getColorData();
+		colorData[firstColor+num*4] = color.r;
+		colorData[firstColor+num*4+1] = color.g;
+		colorData[firstColor+num*4+2] = color.b;
+		colorData[firstColor+num*4+3] = color.a;
+		ultraMesh.updateColorBufferPartial(num, 1*4);
+	}
+	Indice getIndice(int num) {
+		int[] indiceData = ultraMesh.getIndiceData();
+		return Indice(indiceData[firstIndice+num*3],indiceData[firstIndice+num*3+1],indiceData[firstIndice+num*3+2]);
+	}
+	void setIndice(int num, Indice indice) {
+		int[] indiceData = ultraMesh.getIndiceData();
+		indiceData[firstIndice+num*3] = indice.v1;
+		indiceData[firstIndice+num*3+1] = indice.v2;
+		indiceData[firstIndice+num*3+2] = indice.v3;
+		ultraMesh.updateIndiceBufferPartial(num, 1*3);
+	}
 	void calculateCenter() {
 		float[] vertexData = ultraMesh.getVertexData();
 		int vCount = (lastVertex - firstVertex)/3;
@@ -246,7 +301,7 @@ struct ShapeGroup
 		}
 		updateAllVertices();
 	}
-	void setColor(float r, float g, float b, float a) {
+	void setAllColor(float r, float g, float b, float a) {
 		ubyte[] colorData = ultraMesh.getColorData();
 		ubyte rByte = to!ubyte(to!int(r*255));
 		ubyte gByte = to!ubyte(to!int(g*255));
