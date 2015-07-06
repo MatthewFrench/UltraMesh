@@ -1,0 +1,13 @@
+{
+	"dub": {
+		"cachedUpgrades": {
+			"gl3n": "~master",
+			"derelict-util": "2.0.0",
+			"derelict-sdl2": "1.2.9",
+			"dplug": "0.0.3",
+			"gfm": "2.3.23",
+			"derelict-gl3": "1.0.10"
+		},
+		"lastUpgrade": "2015-07-05T20:43:00.401614"
+	}
+}

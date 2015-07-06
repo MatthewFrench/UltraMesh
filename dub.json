@@ -1,0 +1,18 @@
+{
+  "name": "ultramesh",
+  "description": "Ultra Mesh",
+  "homepage": "https://github.com/MatthewFrench/",
+  "license": "MIT",
+  "authors": [
+    "Matthew French"
+  ],
+  "dependencies": {
+    "derelict-sdl2": "1.2.9",
+    "derelict-gl3": "1.0.10",
+	"gl3n": "~master",
+	"dplug": "0.0.3"
+  },
+      "targetName": "ultramesh-example",
+      "targetType": "executable",
+      "targetPath": "./"
+}
