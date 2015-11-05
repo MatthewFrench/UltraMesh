@@ -10,7 +10,8 @@
     "derelict-sdl2": "1.2.9",
     "derelict-gl3": "1.0.10",
 	"gl3n": "~master",
-	"dplug": "0.0.3"
+	"dplug": "0.0.3",
+	"libasync": "~>0.7.7"
   },
       "targetName": "ultramesh-example",
       "targetType": "executable",

@@ -28,14 +28,19 @@ Random gen;
 UltraMesh ultraMesh;
 ShapeGroup ground;
 
+/*
+What do I want to build with this?
+*/
+
 void main() {
   init();
-  animate();
 }
 
 void init() {
 	initCore();
-	initUltraMesh();
+	//initUltraMesh();
+	
+	animate();
 }
 void initCore() {
 	window = new Window("example", to!int(width), to!int(height));
@@ -157,12 +162,15 @@ void animate() {
 				colorData[i*4+2] = to!ubyte(255-to!int(z/height/2.0*255));
 				vertexData[i*3+2] = z;
 			}
-		}
-*/
+		}*/
+
 		//ultraMesh.updateVertexBuffer();
 		//ultraMesh.updateColorBuffer();
 
-		ultraMesh.render(camera);
+		//ultraMesh.render(camera);
+		if (ultraMesh) {
+			ultraMesh.render(camera);
+		}
 		window.update();
 		// check OpenGL error
 		GLenum err;

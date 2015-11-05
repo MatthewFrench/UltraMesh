@@ -121,6 +121,7 @@ class RenderPass : Pass {
 class BlurPass : Pass {
   public:
     this(int width, int height, in float weight=50.0) {
+    	/*
       _widthBlurTexture = new Texture;
 
       _scene = new Scene;
@@ -142,6 +143,7 @@ class BlurPass : Pass {
       );
       _screen = new Mesh(_geometry, _material);
       _scene.add(_screen);
+      */
     }
 
     override void render(Renderer renderer, Texture writeTexture, Texture readTexture) {

@@ -1,11 +1,13 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"gl3n": "~master",
+		"memutils": "0.4.3",
 		"derelict-util": "2.0.0",
-		"derelict-sdl2": "1.2.9",
+		"gl3n": "~master",
 		"dplug": "0.0.3",
 		"gfm": "2.3.23",
+		"libasync": "0.7.7",
+		"derelict-sdl2": "1.2.9",
 		"derelict-gl3": "1.0.10"
 	}
 }
